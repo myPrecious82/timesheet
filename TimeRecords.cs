@@ -60,17 +60,17 @@ namespace timesheet
                 TimeEntries.Add(newEntry);
             }
 
-            //// add another two weeks of dummy date rows
-            //using (var sw = File.AppendText(path))
-            //{
-            //    var lastDate = TimeEntries[TimeEntries.Count - 1].EntryDateTime.Date;
-            //    for (var i = 1; i<15; i++)
-            //    {
-            //        lastDate = lastDate.AddDays(1);
-            //        var str = (lastDate.DayOfWeek == DayOfWeek.Saturday || lastDate.DayOfWeek == DayOfWeek.Sunday) ? $"{lastDate:MM/dd/yyyy}\t\t\t\t\t" : $"{lastDate:MM/dd/yyyy}\t08:00 am\t11:30 am\t12:30 pm\t05:00 pm\t";
-            //        sw.WriteLine(str);
-            //    }
-            //}
+            // add another two weeks of dummy date rows
+            using (var sw = File.AppendText(path))
+            {
+                var lastDate = TimeEntries[TimeEntries.Count - 1].EntryDateTime.Date;
+                for (var i = 1; i < 15; i++)
+                {
+                    lastDate = lastDate.AddDays(1);
+                    var str = (lastDate.DayOfWeek == DayOfWeek.Saturday || lastDate.DayOfWeek == DayOfWeek.Sunday) ? $"{lastDate:MM/dd/yyyy}\t\t\t\t\t" : $"{lastDate:MM/dd/yyyy}\t08:00 am\t11:30 am\t12:30 pm\t05:00 pm\t";
+                    sw.WriteLine(str);
+                }
+            }
         }
     }
 }
