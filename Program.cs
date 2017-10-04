@@ -18,7 +18,7 @@ namespace timesheet
             {
                 var theDay = DateTime.Today.AddDays(-1);
 #if DEBUG
-                theDay = new DateTime(2017, 10, 1).AddDays(-1);
+                theDay = new DateTime(2017, 10, 16).AddDays(-1);
 #endif
 
                 var curDay = theDay.Day;
@@ -27,8 +27,10 @@ namespace timesheet
 
                 var appSettings = ConfigurationManager.AppSettings;
 
-                var path = appSettings["TemplatePath"];
-                object outputPath = appSettings["ExcelOutputPath"];
+                var path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), @"..\..\"));
+                var templatePath = $"{path}{appSettings["TemplateFileName"]}";
+
+                object outputPath = $"{path}{appSettings["ExcelOutputFileName"]}";
                 var newPath = outputPath.ToString().Replace("Timesheet.xlsx", $"{theDay.AddDays(1):MM.dd.yyyy} Timesheet.xlsx");
                 object oMissing = System.Reflection.Missing.Value;
 
@@ -59,7 +61,7 @@ namespace timesheet
                 if (timesheet.Count > 0)
                 {
                     var xlApp = new Application();
-                    var xlWorkBook = xlApp.Workbooks.Open(path, 0, false, 5, "", "", true, XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+                    var xlWorkBook = xlApp.Workbooks.Open(templatePath, 0, false, 5, "", "", true, XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
                     var xlWorkSheet = (Worksheet)xlWorkBook.Worksheets.Item[1];
 
 
@@ -92,11 +94,11 @@ namespace timesheet
                     xlApp.Quit();
                 }
 
-                var emailSendTo = appSettings["EmailTo"];
+                var emailSendTo = appSettings["EmailSendTo"];
                 var emailSubject = appSettings["EmailSubject"];
-                const string emailSmtpHost = "SMTPR.illinois.gov";
-                const string emailSendFrom = "alexis.atchison@illinois.gov";
-                const string emailSendFromDisplay = "Atchison, Alexis";
+                var emailSmtpHost = appSettings["EmailSmtpHost"];
+                var emailSendFrom = appSettings["EmailSendFrom"];
+                var emailSendFromDisplay = appSettings["EmailSendFromDisplay"];
                 var space = new string(Uri.EscapeUriString(" ").ToCharArray());
 
                 var client = new SmtpClient(emailSmtpHost);
@@ -111,7 +113,6 @@ namespace timesheet
                     message.From = new MailAddress(emailSendFrom, emailSendFromDisplay, System.Text.Encoding.UTF8);
                     message.To.Add(new MailAddress(emailSendTo));
                     message.Attachments.Add(new Attachment(newPath.ToString()));
-                    message.Body += $"<span style='font-size:11pt;font-family:Calibri'>{appSettings["EmailBody"]} {newPath.ToString().Replace(" ", space)}</span>";
 
                     client.Send(message);
 
