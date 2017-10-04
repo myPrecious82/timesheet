@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using timesheet.Models;
 
@@ -11,10 +12,14 @@ namespace timesheet
 
         public TimeRecords()
         {
-            const string path = "C:\\LRS Docs\\mine\\Projects\\timesheet\\TimeRecords.txt";
+            var appSettings = ConfigurationManager.AppSettings;
+
+            var path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), @"..\..\"));
+            var templatePath = $"{path}TimeRecords.txt";
+
             TimeEntries = new List<TimeEntry>();
 
-            var entries = File.ReadAllLines(path);
+            var entries = File.ReadAllLines(templatePath);
 
             foreach (var entry in entries)
             {
