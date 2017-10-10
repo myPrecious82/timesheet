@@ -14,7 +14,14 @@ namespace timesheet
         {
             var appSettings = ConfigurationManager.AppSettings;
 
-            var path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), @"..\..\"));
+            // is this running from exe outside of bin folder?
+            var path = Path.GetFullPath(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)) + @"\";
+
+#if DEBUG // if we're debugging, send email to consultant email
+            path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), @"..\..\"));
+            emailSendTo = emailSendFrom;
+#endif
+
             var templatePath = $@"{path}Templates\TimeRecords.txt";
 
             TimeEntries = new List<TimeEntry>();

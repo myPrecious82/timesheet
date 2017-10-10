@@ -33,7 +33,7 @@ namespace timesheet
             var managerName = appSettings["ManagerName"];
             var emailSendTo = appSettings["EmailSendTo"];
 
-            //// is this running from exe outside of bin folder?
+            // is this running from exe outside of bin folder?
             var path = Path.GetFullPath(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)) + @"\";
 
 #if DEBUG // if we're debugging, send email to consultant email
@@ -89,10 +89,10 @@ namespace timesheet
                     var xlWorkSheet = (Worksheet)xlWorkBook.Worksheets.Item[1];
 
 
-                    xlWorkSheet.Cells[4, 8].Value = appSettings["ConsultantName"];
-                    xlWorkSheet.Cells[5, 8].Value = appSettings["ManagerName"];
-                    xlWorkSheet.Cells[6, 8].Value = appSettings["ConsultantPhone"];
-                    xlWorkSheet.Cells[7, 8].Value = appSettings["ConsultantEmail"];
+                    xlWorkSheet.Cells[4, 8].Value = consultantName;
+                    xlWorkSheet.Cells[5, 8].Value = managerName;
+                    xlWorkSheet.Cells[6, 8].Value = consultantPhone;
+                    xlWorkSheet.Cells[7, 8].Value = emailSendFrom;
 
                     xlWorkSheet.Range[xlWorkSheet.Cells[12, 4], xlWorkSheet.Cells[28, 4]].ClearContents();
                     xlWorkSheet.Cells[8, 3].Value = timesheet.First().EntryDateTime.Date;
@@ -118,11 +118,6 @@ namespace timesheet
                     xlApp.Quit();
                 }
 
-                //var emailSendTo = appSettings["EmailSendTo"];
-                //var emailSubject = appSettings["EmailSubject"];
-                //var emailSmtpHost = appSettings["EmailSmtpHost"];
-                //var emailSendFrom = appSettings["EmailSendFrom"];
-                //var emailSendFromDisplay = appSettings["EmailSendFromDisplay"];
                 var space = new string(Uri.EscapeUriString(" ").ToCharArray());
 
                 var client = new SmtpClient(emailSmtpHost);
@@ -145,7 +140,9 @@ namespace timesheet
             }
             catch (Exception ex)
             {
+                Console.WriteLine(path);
                 Console.WriteLine(ex.ToString());
+                Console.Read();
             }
         }
     }
