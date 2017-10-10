@@ -15,7 +15,7 @@ namespace timesheet
             var appSettings = ConfigurationManager.AppSettings;
 
             var path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), @"..\..\"));
-            var templatePath = $"{path}TimeRecords.txt";
+            var templatePath = $@"{path}Templates\TimeRecords.txt";
 
             TimeEntries = new List<TimeEntry>();
 
@@ -61,7 +61,7 @@ namespace timesheet
             }
 
             // add another two weeks of dummy date rows
-            using (var sw = File.AppendText(path))
+            using (var sw = File.AppendText(templatePath))
             {
                 var lastDate = TimeEntries[TimeEntries.Count - 1].EntryDateTime.Date;
                 for (var i = 1; i < 15; i++)

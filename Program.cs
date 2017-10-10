@@ -14,26 +14,50 @@ namespace timesheet
     {
         public static void Main()
         {
-            try
-            {
-                var theDay = DateTime.Today.AddDays(-1);
-#if DEBUG
-                theDay = new DateTime(2017, 10, 16).AddDays(-1);
+            var appSettings = ConfigurationManager.AppSettings;
+
+            // email settings from config
+            var emailSmtpHost = appSettings["EmailSmtpHost"];
+            var emailSubject = appSettings["EmailSubject"];
+            var emailBody = appSettings["EmailBody"];
+
+            // template filenames from config
+            var templateFileName = appSettings["TemplateFileName"];
+            var outputFileName = appSettings["ExcelOutputFileName"];
+
+            // variables to hold information from ConsultantInfo.txt
+            var consultantName = appSettings["ConsultantName"];
+            var consultantPhone = appSettings["ConsultantPhone"];
+            var emailSendFrom = appSettings["EmailSendFrom"];
+            var emailSendFromDisplay = appSettings["EmailSendFromDisplay"];
+            var managerName = appSettings["ManagerName"];
+            var emailSendTo = appSettings["EmailSendTo"];
+
+            //// is this running from exe outside of bin folder?
+            var path = Path.GetFullPath(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)) + @"\";
+
+#if DEBUG // if we're debugging, send email to consultant email
+            path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), @"..\..\"));
+            emailSendTo = emailSendFrom;
 #endif
 
-                var curDay = theDay.Day;
-                var curMonth = theDay.Month;
-                var curYear = theDay.Year;
+            var theDay = DateTime.Today.AddDays(-1);
+#if DEBUG
+            theDay = new DateTime(2017, 10, 16).AddDays(-1);
+#endif
 
-                var appSettings = ConfigurationManager.AppSettings;
+            var curDay = theDay.Day;
+            var curMonth = theDay.Month;
+            var curYear = theDay.Year;
 
-                var path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName), @"..\..\"));
-                var templatePath = $"{path}{appSettings["TemplateFileName"]}";
+            var templatePath = $"{path}{templateFileName}";
+            object outputPath = $"{path}{outputFileName}";
+            var newPath = outputPath.ToString().Replace("Timesheet.xlsx", $"{theDay.AddDays(1):MM.dd.yyyy} Timesheet.xlsx");
 
-                object outputPath = $"{path}{appSettings["ExcelOutputFileName"]}";
-                var newPath = outputPath.ToString().Replace("Timesheet.xlsx", $"{theDay.AddDays(1):MM.dd.yyyy} Timesheet.xlsx");
-                object oMissing = System.Reflection.Missing.Value;
+            object oMissing = System.Reflection.Missing.Value;
 
+            try
+            {
                 var tr = new TimeRecords();
                 var timesheet = new List<TimeEntry>();
 
@@ -94,11 +118,11 @@ namespace timesheet
                     xlApp.Quit();
                 }
 
-                var emailSendTo = appSettings["EmailSendTo"];
-                var emailSubject = appSettings["EmailSubject"];
-                var emailSmtpHost = appSettings["EmailSmtpHost"];
-                var emailSendFrom = appSettings["EmailSendFrom"];
-                var emailSendFromDisplay = appSettings["EmailSendFromDisplay"];
+                //var emailSendTo = appSettings["EmailSendTo"];
+                //var emailSubject = appSettings["EmailSubject"];
+                //var emailSmtpHost = appSettings["EmailSmtpHost"];
+                //var emailSendFrom = appSettings["EmailSendFrom"];
+                //var emailSendFromDisplay = appSettings["EmailSendFromDisplay"];
                 var space = new string(Uri.EscapeUriString(" ").ToCharArray());
 
                 var client = new SmtpClient(emailSmtpHost);
